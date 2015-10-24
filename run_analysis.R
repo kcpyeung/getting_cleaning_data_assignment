@@ -79,3 +79,5 @@ subject_activity_averages <- Reduce(function(...) merge(..., all=T), subject_act
 rm(x)
 rm(subjects_activities)
 rm(compute_average)
+
+write.table(subject_activity_averages, file="subject_activity_averages.txt", row.names=FALSE)
