@@ -1,8 +1,12 @@
+#prepare data
+
 activity_name_lookup <- read.table("activity_labels.txt")
 names(activity_name_lookup) <- c("id", "activity")
 
 features <- read.table("features.txt")
 feature_names <- t(features["V2"])
+feature_names <- feature_names[,c(1:6,41:46,81:86,121:126,161:166,201:202,214:215,227:228,240:241,253:254,266:271,345:350,424:429,503:504,516:517,529:530,542:543)]
+feature_names <- t(as.matrix(feature_names))
 feature_names <- cbind(c("activity"), feature_names)
 feature_names <- cbind(c("row_id"), feature_names)
 feature_names <- cbind(c("activity_id"), feature_names)
@@ -56,3 +60,22 @@ rm(train_results)
 rm(subject_test)
 rm(subject_train)
 
+# compute average
+subjects_activities <- unique(mean_std[, 1:2])
+x <- data.frame()
+
+compute_average <- function(subject_activity) {
+  subject_activity_data_rows <- subset(mean_std, subject == subject_activity[1,1] & activity == subject_activity[1,2])
+  subject_activity_data_rows <- subject_activity_data_rows[, 3:ncol(subject_activity_data_rows)]
+  averaged <- apply(subject_activity_data_rows, 2, mean)
+  averaged <- t(as.matrix(averaged))
+  labelled_averaged <- cbind(subject_activity, averaged)
+  x <- rbind(x, labelled_averaged)
+}
+
+subject_activity_averages <- by(subjects_activities, 1:nrow(subjects_activities), compute_average)
+subject_activity_averages <- Reduce(function(...) merge(..., all=T), subject_activity_averages)
+
+rm(x)
+rm(subjects_activities)
+rm(compute_average)
