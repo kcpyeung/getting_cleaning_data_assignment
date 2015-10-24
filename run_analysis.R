@@ -1,6 +1,13 @@
 activity_name_lookup <- read.table("activity_labels.txt")
 names(activity_name_lookup) <- c("id", "activity")
 
+features <- read.table("features.txt")
+feature_names <- t(features["V2"])
+feature_names <- cbind(c("activity"), feature_names)
+feature_names <- cbind(c("row_id"), feature_names)
+feature_names <- cbind(c("activity_id"), feature_names)
+rm(features)
+
 test <- read.table("test/X_test.txt")
 test_activity_labels <- read.table("test/y_test.txt")
 names(test_activity_labels) <- c("id")
@@ -23,12 +30,19 @@ rm(train)
 rm(train_activity_labels)
 rm(train_activity_names)
 
+names(test_results) <- feature_names
+names(train_results) <- feature_names
+
 all <- rbind(test_results, train_results)
-#all <- merge(test_results, train_results, all=TRUE)
 rm(activity_name_lookup)
 
-mean_std <- all[,c("activity", "V1","V2","V3","V4","V5","V6","V41","V42","V43","V44","V45","V46","V81","V82","V83","V84","V85","V86","V121","V122","V123","V124","V125","V126","V161","V162","V163","V164","V165","V166","V201","V202","V214","V215","V227","V228","V240","V241","V253","V254","V266","V267","V268","V269","V270","V271","V345","V346","V347","V348","V349","V350","V424","V425","V426","V427","V428","V429","V503","V504","V516","V517","V529","V530","V542","V543")]
+feature_names <- feature_names[, -(1:2)]
+feature_names <- as.matrix(feature_names)
+feature_names <- t(feature_names)
 
+mean_std <- all[, feature_names]
+
+rm(feature_names)
 rm(all)
 rm(test_results)
 rm(train_results)
